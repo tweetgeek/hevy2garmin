@@ -1781,7 +1781,11 @@ async def _do_sync_one(request: Request, *, respect_grace: bool = False):
         # Defer before Garmin auth when possible (cron cold starts).
         grace_minutes = config.get("sync", {}).get("grace_period_minutes", 120)
         if respect_grace and _workout_within_grace(unsynced, grace_minutes):
-            sync_one_workout(unsynced, cfg=config, respect_grace=True)
+            logger.info(
+                "Deferring %s — within %d min grace; waiting for watch data",
+                unsynced["id"],
+                grace_minutes,
+            )
             deferred_count += 1
             skip_ids.add(unsynced["id"])
             continue
